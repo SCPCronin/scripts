@@ -1,4 +1,5 @@
 import os
+import sys
 
 # Returns a list of all files or directories based on the path provided, essentially running 'ls'
 def getListOfFilesBasedOnDirectory(directoryPath):
@@ -30,27 +31,33 @@ def cleanUpFileNamesBasedOnDirectory(directoryPath):
         # If the filename doesn't exist, updat the fileName
         if(updatedNameOfFile not in listOfFiles):
             os.rename(file, updatedNameOfFile)
+            print(f"Renamed {file} to {updatedNameOfFile}")
         else:
-            print(f"File already exists for {updatedNameOfFile}")
+            print(f"No need to rename {updatedNameOfFile}, already exists!")
         # Updates the list to catch duplicate files
         listOffiles = getListOfFilesBasedOnDirectory("./")
 
+# For each subdirectory in the folder, clean up immediate files within it 
+def cleanUpAllFilesInFolder():
+    listOfDirectories = getListOfFilesBasedOnDirectory("./")
+    for directory in listOfDirectories:
+        if(os.path.isdir(directory)):
+            cleanUpFileNamesBasedOnDirectory(f"./{directory}")
+            os.chdir("..")
+
+def main():
+    # Allows for user to pass in a folder as argument
+    if len(sys.argv) > 1: 
+        os.chdir(sys.argv[1])
+    cleanUpAllFilesInFolder()
+
+if __name__ == "__main__": 
+    main()
+
+## Utils
 # Future Proofing in case I accidentally remove zip extensions from files again ( ͡° ͜ʖ ͡°)
 def reappendZipExtensionToFilesByDirectory(directoryPath):
     os.chdir(directoryPath)
     listOfFiles = getListOfFilesBasedOnDirectory("./")
     for file in listOfFiles:
         os.rename(file, f"{file}.zip")
-
-# Run 
-def cleanUpAllFilesInRootFolder():
-    listOfDirectories = getListOfFilesBasedOnDirectory("./")
-    for directory in listOfDirectories:
-        cleanUpFileNamesBasedOnDirectory(f"./{directory}")
-
-
-def main():
-    cleanUpAllFilesInRootFolder()
-
-if __name__ == "__main__": 
-    main()
